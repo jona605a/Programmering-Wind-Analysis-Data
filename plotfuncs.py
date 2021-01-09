@@ -1,53 +1,48 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+from mpl_toolkits.mplot3d import Axes3D  # This import registers the 3D projection, but is otherwise unused.
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from dataStatistics import dataStatistics
 
-
-
-def dataPlot(data, statistic):
+def dataPlot(data, statistic, ranges, plottype, Yref = 0, Zref = 0, DeltaX = 0):
     
-    if statistic.lower() == 'mean':
-        plttype = 1
-    elif statistic.lower() == 'variance':
-        plttype = 2
-    elif statistic.lower() == 'cross correlation':
-        plttype = 3
-    else:
-        return 'Error, invalid statistic'
+    M = dataStatistics(data, statistic, Yref, Zref, DeltaX)
     
-    #contourPlot(data)
-    surfacePlot(data)
+    if plottype == 'Contour':
+        contourPlot(M)
+    elif plottype == 'Surface':
+        surfacePlot(M, ranges)
     
     plt.title(statistic + ' plot')
-    plt.axis('equal')
-    plt.ylabel('z')
     plt.xlabel('y')
+    plt.ylabel('z')
     
     
     plt.show()
 
 def contourPlot(data):
-    fig = plt.figure()
     plt.contour(data)
     
-    return fig
         
-def surfacePlot(data):
+def surfacePlot(data, ranges):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     
+    # Ranges
+    Y = np.arange(0, ranges[1])
+    Z = np.arange(0, ranges[2])
+    Y, Z = np.meshgrid(Y, Z)
+    
     # Plot the surface.
-    surf = ax.plot_surface(data, cmap=cm.coolwarm,
+    surf = ax.plot_surface(Y, Z, data, cmap=cm.coolwarm,
                            linewidth=0, antialiased=False)
     
     # Customize the z axis.
-    ax.set_zlim(-1.01, 1.01)
-    ax.zaxis.set_major_locator(LinearLocator(10))
-    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    #ax.set_zlim(-1.01, 1.01)
+    #ax.zaxis.set_major_locator(LinearLocator(10))
+    #ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
     
     # Add a color bar which maps values to colors.
     fig.colorbar(surf, shrink=0.5, aspect=5)
     
-    return fig

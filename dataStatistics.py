@@ -4,7 +4,7 @@ def dataStatistics(data, statistic, Yref = 0, Zref = 0, DeltaX = 0):
 
     y_length = len(data[0])
     z_length = len(data[0,0])
-
+    
     return_statistic = np.zeros((y_length,z_length))
 
     for i in range(y_length):
@@ -19,4 +19,5 @@ def dataStatistics(data, statistic, Yref = 0, Zref = 0, DeltaX = 0):
     return return_statistic
 if __name__ == "__main__":
     test_array = np.array([[[1,2,3],[2,3,4],[3,4,5]],[[4,5,6],[5,6,7],[6,7,8]],[[7,8,9],[8,9,10],[9,10,11]]])
-    print(test_array, dataStatistics(test_array, statistic = "Mean"))
+    print(test_array)
+    print(dataStatistics(test_array, statistic = "Variance"))

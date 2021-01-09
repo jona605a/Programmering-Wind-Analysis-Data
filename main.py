@@ -8,7 +8,7 @@ import os
 # Import our own helping functions
 from loadfuncs import dataLoad
 from plotfuncs import (dataPlot)
-import dataStatistics
+from dataStatistics import dataStatistics
 
 # Mikkel's helping functions
 from displayMenu import displayMenu #The displayMenu function is made by Mikkel N. Schmidt. See the function discription for more information. 
@@ -18,6 +18,7 @@ from inputNumber import inputNumber, get_int_in_range #The inputNumber function 
 # The different menu options and lists of text
 menuOptions = np.array(['Load Data', 'Display statistics', 'Generate plots', 'Quit'])
 statisticsOptions = np.array(['Mean', 'Variance', 'Cross Correlation'])
+plotOptions = np.array(['Contour', 'Surface'])
 
 data = []
 
@@ -34,10 +35,10 @@ while True:
     if selection == 1: # Load wind data
         
         while True:
-            filename = input('Please enter a correct filename\nfor the data or press "q" to escape: ')
+            filename = input('Please enter a correct filename for the data (turbine_32x32x8192.bin)\n or press "q" to escape: ')
             if filename == 'q':
                     break
-            elif not os.path.exists(filename):
+            elif not os.path.exists(filename): # turbine_32x32x8192.bin
                 print('\nInvalid filename')
             else:
                 ranges = ['Nx', 'Ny', 'Nz']
@@ -51,8 +52,11 @@ while True:
         
     elif selection == 2: # Display Statistics
         if not len(data):
-            print("Error. Please load data first")
+            print('\nError. Please load data first')
             continue
+        
+        print('\n------------Display Statistics------------\n')
+        print('Which statistic do you want to display?')
         
         stat_selection = displayMenu(statisticsOptions)
         statistic = statisticsOptions[stat_selection-1]
@@ -62,11 +66,25 @@ while True:
         z = get_int_in_range('Please enter a value for z: ', 1, ranges[2])
         
         if statistic in ['Mean', 'Variance']:
+            # Calculate the statistic
             Myz = dataStatistics(data, statistic)
-            print('The % of the data, where y = % and z = %' % (statistic, y,z))
+            
+            # Print to the user
+            print('The {} of the data, where y = {} and z = {}'.format(statistic, y,z))
             print('\n', Myz[y, z])
         elif statistic == 'Cross Correlation':
-            pass
+            # Inquire about additional information
+            yref = get_int_in_range('Please enter a value for Yref: ', 1, ranges[1])
+            zref = get_int_in_range('Please enter a value for Zref: ', 1, ranges[2])
+            DeltaX = get_int_in_range('Please enter a value for DeltaX: ', 1, ranges[0]-1)
+            
+            # Calculate the statistic
+            Myz = dataStatistics(data, statistic, yref, zref, DeltaX)
+            
+            # Print to the user
+            print('The {} of the data, where y = {} and z = {}, \n Yref = {}, Zref = {} and DeltaX = {}'.format(statistic, y, z, yref, zref, DeltaX))
+            print('\n', Myz[y, z])
+        
         
         
         
@@ -74,18 +92,29 @@ while True:
         if not len(data):
             print("Error. Please load data first")
             continue
-        print('\nDo you like colors?')
-        colorStyle = displayMenu(plotOptions)
+        
+        print('\n------------Generate plots------------\n')
+        print('Which statistic do you want to plot?')
+        
+        stat_selection = displayMenu(statisticsOptions)
+        statistic = statisticsOptions[stat_selection - 1]
+        
+        plotoptions = [statistic, ranges]
+        
+        print('\nWhat kind of plot do you want?')
+        plot_selection = displayMenu(plotOptions)
+        # Either 'Contour' or 'Surface'
+        plotoptions.append(plotOptions[plot_selection - 1]) 
+        
+        if statistic == 'Cross Correlation':
+            plotoptions.append( get_int_in_range('Please enter a value for Yref: ', 1, ranges[1]) )
+            plotoptions.append( get_int_in_range('Please enter a value for Zref: ', 1, ranges[2]) )
+            plotoptions.append( get_int_in_range('Please enter a value for DeltaX: ', 1, ranges[0]-1) )
         
         
-        print('\n-----------Statistics-----------\n')
-        print('Current Lindenmayer system: {}\nNumber of iterations: {}\n'.format(System,N))
+        dataPlot(data, *plotoptions)
         
-        print("The total number of line segments are",sum(turtleCommands == lineLength))
-        print("The total length of the curve is",round(sum(turtleCommands[turtleCommands == lineLength]),3))
-        print("The total number of left turns are",sum((turtleCommands != lineLength)&(turtleCommands>0)))
-        print("The total number of right turns are",sum((turtleCommands != lineLength)&(turtleCommands<0)))
-        input('Press enter to return to Main Menu... ')
+        
     elif selection == 4: # Quit program
         print('Thank you for using Windalyzer!\nWe hope to see you again soon!')
         break
