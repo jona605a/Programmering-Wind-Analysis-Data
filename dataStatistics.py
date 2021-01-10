@@ -13,6 +13,8 @@ def dataStatistics(data, statistic, Yref = 0, Zref = 0, DeltaX = 0):
                 return_statistic[i,j] = np.mean(data[:,i,j])
             elif statistic == "Variance":
                 return_statistic[i,j] = np.var(data[:,i,j])
+            elif statistic == "Standard deviation":
+                return_statistic[i,j] = np.std(data[:,i,j])
             else:
                 return_statistic[i,j] = np.correlate(data[:(len(data) - DeltaX),i,j], data[DeltaX:,i,j])
 

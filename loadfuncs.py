@@ -9,13 +9,13 @@ def dataLoad(filename, Nx, Ny, Nz):
         data = np.reshape(data, (Nx,Ny,Nz))
         errormessage = 'No error'
     except:
-        # Temporary
-        data = np.reshape(data, (len(data)//(Ny*Nz), Ny, Nz))
-        errormessage = 'Wrong dimension'
+        
+        errormessage = 'Wrong dimensions given. Please input valid ranges. \nThere are {:,.0f} points in the given file. '.format(len(data))
     
     return data, errormessage
 
 
 
 if __name__ == '__main__':
-    data = dataLoad('turbine_32x32x8192.bin', 40960, 32, 32)
+    data, errormessage = dataLoad('turbine_32x32x8192.bin', 40960, 32, 32)
+    print(errormessage)
